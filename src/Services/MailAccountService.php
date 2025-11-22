@@ -13,7 +13,7 @@ class MailAccountService
 {
     protected ClientManager $clientManager;
 
-    public function __construct(ClientManager $clientManager = null)
+    public function __construct(?ClientManager $clientManager = null)
     {
         $this->clientManager = $clientManager ?? new ClientManager([]);
     }
@@ -21,8 +21,6 @@ class MailAccountService
     /**
      * Create a new mail account with validation and connection testing
      *
-     * @param array $data
-     * @return MailAccount
      * @throws ValidationException
      * @throws Exception
      */
@@ -54,9 +52,6 @@ class MailAccountService
     /**
      * Update an existing mail account with validation and connection testing
      *
-     * @param MailAccount $mailAccount
-     * @param array $data
-     * @return MailAccount
      * @throws ValidationException
      * @throws Exception
      */
@@ -81,7 +76,6 @@ class MailAccountService
     /**
      * Validate mail account data for creation
      *
-     * @param array $data
      * @throws ValidationException
      */
     protected function validateForCreate(array $data): void
@@ -92,7 +86,7 @@ class MailAccountService
                 'required',
                 'email',
                 'max:255',
-                'unique:mail_accounts,email_address'
+                'unique:mail_accounts,email_address',
             ],
             'host' => 'required|string|max:255',
             'port' => 'required|integer|min:1|max:65535',
@@ -112,8 +106,6 @@ class MailAccountService
     /**
      * Validate mail account data for update
      *
-     * @param array $data
-     * @param int $excludeId
      * @throws ValidationException
      */
     protected function validateForUpdate(array $data, int $excludeId): void
@@ -124,7 +116,7 @@ class MailAccountService
                 'sometimes',
                 'email',
                 'max:255',
-                "unique:mail_accounts,email_address,$excludeId"
+                "unique:mail_accounts,email_address,$excludeId",
             ],
             'host' => 'sometimes|string|max:255',
             'port' => 'sometimes|integer|min:1|max:65535',
@@ -144,7 +136,6 @@ class MailAccountService
     /**
      * Test IMAP connection using Webklex ClientManager
      *
-     * @param array $connectionData
      * @throws Exception
      */
     protected function testConnection(array $connectionData): void
@@ -157,7 +148,7 @@ class MailAccountService
                 'validate_cert' => true,
                 'username' => $connectionData['username'],
                 'password' => $connectionData['password'],
-                'protocol' => 'imap'
+                'protocol' => 'imap',
             ]);
 
             // Try to connect and get folders to verify the connection works
@@ -166,17 +157,14 @@ class MailAccountService
             $client->disconnect();
 
         } catch (ConnectionFailedException $e) {
-            throw new Exception('IMAP connection failed: ' . $e->getMessage(), 0, $e);
+            throw new Exception('IMAP connection failed: '.$e->getMessage(), 0, $e);
         } catch (Exception $e) {
-            throw new Exception('Failed to establish IMAP connection: ' . $e->getMessage(), 0, $e);
+            throw new Exception('Failed to establish IMAP connection: '.$e->getMessage(), 0, $e);
         }
     }
 
     /**
      * Test connection for an existing mail account and update connection status
-     *
-     * @param MailAccount $mailAccount
-     * @return bool
      */
     public function testExistingConnection(MailAccount $mailAccount): bool
     {

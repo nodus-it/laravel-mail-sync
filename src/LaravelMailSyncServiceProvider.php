@@ -26,7 +26,7 @@ class LaravelMailSyncServiceProvider extends PackageServiceProvider
     public function packageRegistered(): void
     {
         $this->app->singleton(MailAccountService::class, function ($app) {
-            return new MailAccountService();
+            return new MailAccountService;
         });
     }
 }

@@ -4,8 +4,8 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Validation\ValidationException;
 use NodusIT\LaravelMailSync\Models\MailAccount;
 use NodusIT\LaravelMailSync\Services\MailAccountService;
-use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Client;
+use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 
 uses(RefreshDatabase::class);
@@ -51,12 +51,12 @@ describe('MailAccountService', function () {
 
     it('throws validation exception for invalid email', function () {
         $invalidData = array_merge($this->validMailAccountData, [
-            'email_address' => 'invalid-email'
+            'email_address' => 'invalid-email',
         ]);
 
-        $service = new MailAccountService();
+        $service = new MailAccountService;
 
-        expect(fn() => $service->create($invalidData))
+        expect(fn () => $service->create($invalidData))
             ->toThrow(ValidationException::class);
     });
 
@@ -66,31 +66,31 @@ describe('MailAccountService', function () {
             // Missing required fields
         ];
 
-        $service = new MailAccountService();
+        $service = new MailAccountService;
 
-        expect(fn() => $service->create($invalidData))
+        expect(fn () => $service->create($invalidData))
             ->toThrow(ValidationException::class);
     });
 
     it('throws validation exception for invalid port', function () {
         $invalidData = array_merge($this->validMailAccountData, [
-            'port' => 70000 // Invalid port number
+            'port' => 70000, // Invalid port number
         ]);
 
-        $service = new MailAccountService();
+        $service = new MailAccountService;
 
-        expect(fn() => $service->create($invalidData))
+        expect(fn () => $service->create($invalidData))
             ->toThrow(ValidationException::class);
     });
 
     it('throws validation exception for invalid encryption', function () {
         $invalidData = array_merge($this->validMailAccountData, [
-            'encryption' => 'invalid-encryption'
+            'encryption' => 'invalid-encryption',
         ]);
 
-        $service = new MailAccountService();
+        $service = new MailAccountService;
 
-        expect(fn() => $service->create($invalidData))
+        expect(fn () => $service->create($invalidData))
             ->toThrow(ValidationException::class);
     });
 
@@ -102,7 +102,7 @@ describe('MailAccountService', function () {
 
         $service = new MailAccountService($mockClientManager);
 
-        expect(fn() => $service->create($this->validMailAccountData))
+        expect(fn () => $service->create($this->validMailAccountData))
             ->toThrow(Exception::class, 'IMAP connection failed: Connection failed');
     });
 
@@ -151,10 +151,10 @@ describe('MailAccountService', function () {
 
         // Try to create second account with same email
         $duplicateData = array_merge($this->validMailAccountData, [
-            'name' => 'Duplicate Account'
+            'name' => 'Duplicate Account',
         ]);
 
-        expect(fn() => $service->create($duplicateData))
+        expect(fn () => $service->create($duplicateData))
             ->toThrow(ValidationException::class);
     });
 
@@ -222,7 +222,7 @@ describe('MailAccountService', function () {
 
             $data = array_merge($this->validMailAccountData, [
                 'email_address' => "test-{$encryption}@example.com",
-                'encryption' => $encryption
+                'encryption' => $encryption,
             ]);
 
             $mailAccount = $service->create($data);
