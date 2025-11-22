@@ -4,7 +4,6 @@ namespace NodusIT\LaravelMailSync\Services;
 
 use Exception;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use NodusIT\LaravelMailSync\Models\MailAccount;
 use NodusIT\LaravelMailSync\Models\MailMessage;
@@ -24,10 +23,6 @@ class MailMessageService
     /**
      * Sync messages from a mail account
      *
-     * @param MailAccount $mailAccount
-     * @param string $folderName
-     * @param int|null $limit
-     * @return Collection
      * @throws Exception
      */
     public function syncMessages(MailAccount $mailAccount, string $folderName = 'INBOX', ?int $limit = null): Collection
@@ -70,20 +65,16 @@ class MailMessageService
         } catch (ConnectionFailedException $e) {
             $mailAccount->update([
                 'last_connection_failed_at' => now(),
-                'last_connection_error' => 'Connection failed: ' . $e->getMessage(),
+                'last_connection_error' => 'Connection failed: '.$e->getMessage(),
             ]);
-            throw new Exception('Failed to connect to mail server: ' . $e->getMessage(), 0, $e);
+            throw new Exception('Failed to connect to mail server: '.$e->getMessage(), 0, $e);
         } catch (Exception $e) {
-            throw new Exception('Failed to sync messages: ' . $e->getMessage(), 0, $e);
+            throw new Exception('Failed to sync messages: '.$e->getMessage(), 0, $e);
         }
     }
 
     /**
      * Store a single message in the database
-     *
-     * @param MailAccount $mailAccount
-     * @param Message $message
-     * @return MailMessage|null
      */
     public function storeMessage(MailAccount $mailAccount, Message $message): ?MailMessage
     {
@@ -105,10 +96,6 @@ class MailMessageService
 
     /**
      * Create a new mail message from IMAP message
-     *
-     * @param MailAccount $mailAccount
-     * @param Message $message
-     * @return MailMessage
      */
     protected function createNewMessage(MailAccount $mailAccount, Message $message): MailMessage
     {
@@ -121,10 +108,6 @@ class MailMessageService
 
     /**
      * Update existing message with current data
-     *
-     * @param MailMessage $existingMessage
-     * @param Message $message
-     * @return MailMessage
      */
     protected function updateExistingMessage(MailMessage $existingMessage, Message $message): MailMessage
     {
@@ -147,9 +130,6 @@ class MailMessageService
 
     /**
      * Parse IMAP message into array suitable for MailMessage model
-     *
-     * @param Message $message
-     * @return array
      */
     protected function parseMessage(Message $message): array
     {
@@ -169,7 +149,7 @@ class MailMessageService
         }
 
         // Generate checksum for duplicate detection
-        $checksumData = $message->getMessageId() . $message->getSubject() . $message->getDate();
+        $checksumData = $message->getMessageId().$message->getSubject().$message->getDate();
         $checksum = hash('sha256', $checksumData);
 
         return [
@@ -187,7 +167,7 @@ class MailMessageService
             'reply_to_email' => $replyTo ? $replyTo->mail : null,
             'reply_to_name' => $replyTo ? $replyTo->personal : null,
             'in_reply_to' => $message->getInReplyTo(),
-            //'references' => $message->getReferences() ? implode(' ', $message->getReferences()) : null,
+            // 'references' => $message->getReferences() ? implode(' ', $message->getReferences()) : null,
             'thread_hash' => $this->generateThreadHash($message),
             'body_text' => $bodyText,
             'body_html' => $bodyHtml,
@@ -208,9 +188,6 @@ class MailMessageService
 
     /**
      * Parse message importance from headers
-     *
-     * @param Message $message
-     * @return int|null
      */
     protected function parseImportance(Message $message): ?int
     {
@@ -227,14 +204,12 @@ class MailMessageService
         } catch (Exception $e) {
             // Header doesn't exist or can't be parsed
         }
+
         return null;
     }
 
     /**
      * Parse message priority from headers
-     *
-     * @param Message $message
-     * @return int|null
      */
     protected function parsePriority(Message $message): ?int
     {
@@ -242,19 +217,18 @@ class MailMessageService
             $priority = $message->getHeader()->get('x-priority');
             if ($priority && $priority->first()) {
                 $priorityValue = (int) $priority->first();
+
                 return $priorityValue >= 1 && $priorityValue <= 5 ? $priorityValue : null;
             }
         } catch (Exception $e) {
             // Header doesn't exist or can't be parsed
         }
+
         return null;
     }
 
     /**
      * Generate thread hash for message threading
-     *
-     * @param Message $message
-     * @return string|null
      */
     protected function generateThreadHash(Message $message): ?string
     {
@@ -268,6 +242,7 @@ class MailMessageService
         if ($inReplyTo || $references) {
             // Use the first reference or in-reply-to as thread identifier
             $threadId = $inReplyTo ?: ($references ? $references[0] : null);
+
             return $threadId ? hash('sha256', $threadId) : null;
         }
 
@@ -278,8 +253,8 @@ class MailMessageService
     /**
      * Create IMAP client for mail account
      *
-     * @param MailAccount $mailAccount
      * @return \Webklex\PHPIMAP\Client
+     *
      * @throws Exception
      */
     protected function createClient(MailAccount $mailAccount)
@@ -295,15 +270,13 @@ class MailMessageService
                 'protocol' => 'imap',
             ]);
         } catch (Exception $e) {
-            throw new Exception('Failed to create IMAP client: ' . $e->getMessage(), 0, $e);
+            throw new Exception('Failed to create IMAP client: '.$e->getMessage(), 0, $e);
         }
     }
 
     /**
      * Get available folders for a mail account
      *
-     * @param MailAccount $mailAccount
-     * @return Collection
      * @throws Exception
      */
     public function getFolders(MailAccount $mailAccount): Collection
@@ -325,16 +298,13 @@ class MailMessageService
             });
 
         } catch (Exception $e) {
-            throw new Exception('Failed to get folders: ' . $e->getMessage(), 0, $e);
+            throw new Exception('Failed to get folders: '.$e->getMessage(), 0, $e);
         }
     }
 
     /**
      * Get message count for a specific folder
      *
-     * @param MailAccount $mailAccount
-     * @param string $folderName
-     * @return array
      * @throws Exception
      */
     public function getMessageCount(MailAccount $mailAccount, string $folderName = 'INBOX'): array
@@ -356,7 +326,7 @@ class MailMessageService
             ];
 
         } catch (Exception $e) {
-            throw new Exception('Failed to get message count: ' . $e->getMessage(), 0, $e);
+            throw new Exception('Failed to get message count: '.$e->getMessage(), 0, $e);
         }
     }
 }

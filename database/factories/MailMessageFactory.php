@@ -15,13 +15,13 @@ class MailMessageFactory extends Factory
         $sentAt = $this->faker->dateTimeBetween('-1 month', 'now');
         $receivedAt = $this->faker->dateTimeBetween($sentAt, 'now');
         $bodyText = $this->faker->paragraphs(3, true);
-        $bodyHtml = '<p>' . implode('</p><p>', $this->faker->paragraphs(3)) . '</p>';
+        $bodyHtml = '<p>'.implode('</p><p>', $this->faker->paragraphs(3)).'</p>';
 
         return [
             'mail_account_id' => MailAccount::factory(),
             'remote_uid' => $this->faker->unique()->numberBetween(1, 999999),
             'remote_msg_no' => $this->faker->optional(0.8)->numberBetween(1, 9999),
-            'message_id' => '<' . $this->faker->uuid() . '@' . $this->faker->domainName() . '>',
+            'message_id' => '<'.$this->faker->uuid().'@'.$this->faker->domainName().'>',
             'subject' => $this->faker->sentence(),
             'sent_at' => $sentAt,
             'received_at' => $receivedAt,
@@ -59,16 +59,16 @@ class MailMessageFactory extends Factory
     private function generateRawHeaders(): string
     {
         $headers = [
-            'Return-Path: <' . $this->faker->safeEmail() . '>',
-            'Received: from ' . $this->faker->domainName() . ' by ' . $this->faker->domainName(),
-            'Date: ' . $this->faker->dateTimeThisMonth()->format('D, d M Y H:i:s O'),
-            'From: ' . $this->faker->name() . ' <' . $this->faker->safeEmail() . '>',
-            'To: ' . $this->faker->name() . ' <' . $this->faker->safeEmail() . '>',
-            'Subject: ' . $this->faker->sentence(),
-            'Message-ID: <' . $this->faker->uuid() . '@' . $this->faker->domainName() . '>',
+            'Return-Path: <'.$this->faker->safeEmail().'>',
+            'Received: from '.$this->faker->domainName().' by '.$this->faker->domainName(),
+            'Date: '.$this->faker->dateTimeThisMonth()->format('D, d M Y H:i:s O'),
+            'From: '.$this->faker->name().' <'.$this->faker->safeEmail().'>',
+            'To: '.$this->faker->name().' <'.$this->faker->safeEmail().'>',
+            'Subject: '.$this->faker->sentence(),
+            'Message-ID: <'.$this->faker->uuid().'@'.$this->faker->domainName().'>',
             'MIME-Version: 1.0',
-            'Content-Type: multipart/alternative; boundary="' . $this->faker->uuid() . '"',
-            'X-Mailer: ' . $this->faker->randomElement(['Outlook', 'Thunderbird', 'Apple Mail', 'Gmail']),
+            'Content-Type: multipart/alternative; boundary="'.$this->faker->uuid().'"',
+            'X-Mailer: '.$this->faker->randomElement(['Outlook', 'Thunderbird', 'Apple Mail', 'Gmail']),
         ];
 
         return implode("\r\n", $headers);

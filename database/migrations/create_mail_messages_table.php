@@ -29,9 +29,9 @@ return new class extends Migration
             $table->string('reply_to_email', 320)->nullable();
             $table->string('reply_to_name', 191)->nullable();
 
-            //$table->json('to_recipients')->nullable();
-            //$table->json('cc_recipients')->nullable();
-            //$table->json('bcc_recipients')->nullable();
+            // $table->json('to_recipients')->nullable();
+            // $table->json('cc_recipients')->nullable();
+            // $table->json('bcc_recipients')->nullable();
 
             $table->string('in_reply_to', 255)->nullable();
             $table->text('references')->nullable();

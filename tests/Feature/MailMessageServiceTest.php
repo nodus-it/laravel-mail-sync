@@ -5,14 +5,14 @@ use Illuminate\Support\Collection;
 use NodusIT\LaravelMailSync\Models\MailAccount;
 use NodusIT\LaravelMailSync\Models\MailMessage;
 use NodusIT\LaravelMailSync\Services\MailMessageService;
+use Webklex\PHPIMAP\Attribute;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 use Webklex\PHPIMAP\Exceptions\ConnectionFailedException;
 use Webklex\PHPIMAP\Folder;
+use Webklex\PHPIMAP\Header;
 use Webklex\PHPIMAP\Message;
 use Webklex\PHPIMAP\Query\WhereQuery;
-use Webklex\PHPIMAP\Header;
-use Webklex\PHPIMAP\Attribute;
 use Webklex\PHPIMAP\Support\FlagCollection;
 use Webklex\PHPIMAP\Support\FolderCollection;
 use Webklex\PHPIMAP\Support\MessageCollection;
@@ -40,7 +40,7 @@ describe('MailMessageService', function () {
         $mockMessage->shouldReceive('getDate')->andReturn(now());
         $mockMessage->shouldReceive('getSize')->andReturn(1024);
         $mockMessage->shouldReceive('getFrom')->andReturn(collect([
-            (object) ['mail' => 'sender@example.com', 'personal' => 'Sender Name']
+            (object) ['mail' => 'sender@example.com', 'personal' => 'Sender Name'],
         ]));
         $mockMessage->shouldReceive('getReplyTo')->andReturn(collect());
         $mockMessage->shouldReceive('getInReplyTo')->andReturn(null);
@@ -106,7 +106,7 @@ describe('MailMessageService', function () {
     it('can store a new message', function () {
         $mockMessage = createMockMessage();
 
-        $service = new MailMessageService();
+        $service = new MailMessageService;
         $result = $service->storeMessage($this->mailAccount, $mockMessage);
 
         expect($result)->toBeInstanceOf(MailMessage::class);
@@ -132,7 +132,7 @@ describe('MailMessageService', function () {
             'flags' => new FlagCollection(['Seen', 'Flagged']),
         ]);
 
-        $service = new MailMessageService();
+        $service = new MailMessageService;
         $result = $service->storeMessage($this->mailAccount, $mockMessage);
 
         expect($result->id)->toBe($existingMessage->id);
