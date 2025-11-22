@@ -15,9 +15,10 @@ You can install the package via composer:
 composer require nodus-it/laravel-mail-sync
 ```
 
-You can run the migrations with:
+You can publish and run the migrations with:
 
 ```bash
+php artisan vendor:publish --tag="laravel-mail-sync-migrations"
 php artisan migrate
 ```
 
@@ -90,6 +91,110 @@ try {
     // Handle connection or other errors
     echo "Error: " . $e->getMessage();
 }
+```
+
+### MailMessageService
+
+The `MailMessageService` allows you to sync email messages from IMAP servers and store them in your database with full message content and metadata.
+
+#### Syncing Messages from a Mail Account
+
+```php
+use NodusIT\LaravelMailSync\Models\MailAccount as MailAccountModel;
+use NodusIT\LaravelMailSync\Facades\MailMessage;
+
+$mailAccount = MailAccountModel::find(1);
+
+// Sync all messages from INBOX
+$syncedMessages = MailMessage::syncMessages($mailAccount);
+
+// Sync messages from a specific folder with limit
+$syncedMessages = MailMessage::syncMessages($mailAccount, 'INBOX/Sent', 50);
+
+echo "Synced " . $syncedMessages->count() . " messages";
+```
+
+#### Getting Available Folders
+
+```php
+$mailAccount = MailAccountModel::find(1);
+
+$folders = MailMessage::getFolders($mailAccount);
+
+foreach ($folders as $folder) {
+    echo "Folder: " . $folder['name'] . " (" . $folder['full_name'] . ")\n";
+    echo "Has children: " . ($folder['has_children'] ? 'Yes' : 'No') . "\n";
+}
+```
+
+#### Getting Message Counts
+
+```php
+$mailAccount = MailAccountModel::find(1);
+
+$counts = MailMessage::getMessageCount($mailAccount, 'INBOX');
+
+echo "Total messages: " . $counts['total'] . "\n";
+echo "Unread messages: " . $counts['unread'] . "\n";
+echo "Read messages: " . $counts['read'] . "\n";
+```
+
+#### Working with Synced Messages
+
+```php
+use NodusIT\LaravelMailSync\Models\MailMessage as MailMessageModel;
+
+// Get all messages for an account
+$messages = MailMessageModel::forAccount($mailAccount->id)->get();
+
+// Get unread messages
+$unreadMessages = MailMessageModel::forAccount($mailAccount->id)->unread()->get();
+
+// Get flagged messages
+$flaggedMessages = MailMessageModel::forAccount($mailAccount->id)->flagged()->get();
+
+// Access message content
+foreach ($messages as $message) {
+    echo "Subject: " . $message->subject . "\n";
+    echo "From: " . $message->from_name . " <" . $message->from_email . ">\n";
+    echo "Body Preview: " . $message->body_preview . "\n";
+    echo "Is Read: " . ($message->is_seen ? 'Yes' : 'No') . "\n";
+    echo "---\n";
+}
+```
+
+#### Error Handling for Message Sync
+
+```php
+try {
+    $syncedMessages = MailMessage::syncMessages($mailAccount, 'INBOX', 100);
+    echo "Successfully synced " . $syncedMessages->count() . " messages";
+} catch (\Exception $e) {
+    echo "Sync failed: " . $e->getMessage();
+    
+    // Check account for connection errors
+    $mailAccount->refresh();
+    if ($mailAccount->last_connection_error) {
+        echo "Connection error: " . $mailAccount->last_connection_error;
+    }
+}
+```
+
+#### Using the Service Directly
+
+```php
+use NodusIT\LaravelMailSync\Services\MailMessageService;
+
+$service = new MailMessageService();
+
+// Sync messages
+$syncedMessages = $service->syncMessages($mailAccount, 'INBOX', 25);
+
+// Get folders
+$folders = $service->getFolders($mailAccount);
+
+// Get message count
+$counts = $service->getMessageCount($mailAccount, 'INBOX');
 ```
 
 ## Testing

@@ -3,6 +3,7 @@
 namespace NodusIT\LaravelMailSync;
 
 use NodusIT\LaravelMailSync\Services\MailAccountService;
+use NodusIT\LaravelMailSync\Services\MailMessageService;
 use Spatie\LaravelPackageTools\Package;
 use Spatie\LaravelPackageTools\PackageServiceProvider;
 
@@ -19,14 +20,18 @@ class LaravelMailSyncServiceProvider extends PackageServiceProvider
             ->name('laravel-mail-sync')
             ->hasConfigFile()
             ->hasViews()
-            ->hasMigration('create_laravel_mail_sync_table')
-            ->hasMigration('create_mail_accounts_table');
+            ->hasMigration('2025_11_22_000000_create_mail_accounts_table')
+            ->hasMigration('2025_11_22_000001_create_mail_messages_table');
     }
 
     public function packageRegistered(): void
     {
         $this->app->singleton(MailAccountService::class, function ($app) {
             return new MailAccountService;
+        });
+
+        $this->app->singleton(MailMessageService::class, function ($app) {
+            return new MailMessageService;
         });
     }
 }

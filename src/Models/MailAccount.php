@@ -4,6 +4,7 @@ namespace NodusIT\LaravelMailSync\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use NodusIT\LaravelMailSync\Database\Factories\MailAccountFactory;
 
 class MailAccount extends Model
@@ -39,4 +40,12 @@ class MailAccount extends Model
     protected $hidden = [
         'password',
     ];
+
+    /**
+     * Get the mail messages for this account
+     */
+    public function mailMessages(): HasMany
+    {
+        return $this->hasMany(MailMessage::class);
+    }
 }
