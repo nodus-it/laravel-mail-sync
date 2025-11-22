@@ -45,13 +45,13 @@ it('hides password in array representation', function () {
 it('casts attributes correctly', function () {
     $mailAccount = MailAccount::factory()->create([
         'is_active' => 1,
-        'last_connection_failed' => 0,
+        'last_connection_failed_at' => null,
         'port' => '993',
         'last_synced_at' => '2023-01-01 12:00:00',
     ]);
 
     expect($mailAccount->is_active)->toBeBool();
-    expect($mailAccount->last_connection_failed)->toBeBool();
+    expect($mailAccount->last_connection_failed_at)->toBeNull();
     expect($mailAccount->port)->toBeInt();
     expect($mailAccount->last_synced_at)->toBeInstanceOf(\Carbon\Carbon::class);
 });
@@ -60,7 +60,7 @@ it('can create active mail account using factory state', function () {
     $mailAccount = MailAccount::factory()->active()->create();
 
     expect($mailAccount->is_active)->toBeTrue();
-    expect($mailAccount->last_connection_failed)->toBeFalse();
+    expect($mailAccount->last_connection_failed_at)->toBeNull();
     expect($mailAccount->last_connection_error)->toBeNull();
 });
 
@@ -73,7 +73,7 @@ it('can create inactive mail account using factory state', function () {
 it('can create mail account with connection error using factory state', function () {
     $mailAccount = MailAccount::factory()->withConnectionError()->create();
 
-    expect($mailAccount->last_connection_failed)->toBeTrue();
+    expect($mailAccount->last_connection_failed_at)->toBeInstanceOf(\Carbon\Carbon::class);
     expect($mailAccount->last_connection_error)->not->toBeNull();
 });
 
@@ -91,7 +91,7 @@ it('has correct fillable attributes', function () {
         'is_active',
         'last_synced_at',
         'last_connection_error',
-        'last_connection_failed',
+        'last_connection_failed_at',
     ];
 
     expect($mailAccount->getFillable())->toBe($expectedFillable);

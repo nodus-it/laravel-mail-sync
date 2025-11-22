@@ -26,12 +26,12 @@ class MailAccount extends Model
         'is_active',
         'last_synced_at',
         'last_connection_error',
-        'last_connection_failed',
+        'last_connection_failed_at',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'last_connection_failed' => 'boolean',
+        'last_connection_failed_at' => 'datetime',
         'last_synced_at' => 'datetime',
         'port' => 'integer',
     ];

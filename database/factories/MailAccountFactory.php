@@ -19,10 +19,10 @@ class MailAccountFactory extends Factory
             'encryption' => $this->faker->randomElement(['ssl', 'tls', null]),
             'username' => $this->faker->userName(),
             'password' => $this->faker->password(),
-            'is_active' => $this->faker->boolean(80), // 80% chance of being active
+            'is_active' => $this->faker->boolean(80),
             'last_synced_at' => $this->faker->optional(0.7)->dateTimeBetween('-1 month', 'now'),
             'last_connection_error' => $this->faker->optional(0.2)->sentence(),
-            'last_connection_failed' => $this->faker->boolean(20), // 20% chance of connection failure
+            'last_connection_failed_at' => $this->faker->optional(0.2)->dateTimeBetween('-1 week', 'now'),
         ];
     }
 
@@ -30,7 +30,7 @@ class MailAccountFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'is_active' => true,
-            'last_connection_failed' => false,
+            'last_connection_failed_at' => null,
             'last_connection_error' => null,
         ]);
     }
@@ -45,7 +45,7 @@ class MailAccountFactory extends Factory
     public function withConnectionError(): static
     {
         return $this->state(fn (array $attributes) => [
-            'last_connection_failed' => true,
+            'last_connection_failed_at' => $this->faker->dateTimeBetween('-1 day', 'now'),
             'last_connection_error' => $this->faker->sentence(),
         ]);
     }

@@ -20,7 +20,7 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamp('last_synced_at')->nullable();
             $table->text('last_connection_error')->nullable();
-            $table->boolean('last_connection_failed')->default(false);
+            $table->timestamp('last_connection_failed_at')->nullable();
             $table->timestamps();
         });
     }
