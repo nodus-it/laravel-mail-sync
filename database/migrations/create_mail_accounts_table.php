@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('mail_accounts', function (Blueprint $table) {
-            $table->id(); // bigint unsigned (PK)
+            $table->id();
             $table->string('name');
             $table->string('email_address');
             $table->string('host');
