@@ -17,19 +17,21 @@
     ],
     "require": {
         "php": "^8.3",
+        "laravel/framework": "^11|^12",
         "spatie/laravel-package-tools": "^1.16",
+        "webklex/laravel-imap": "^6.2"
     },
     "require-dev": {
         "laravel/pint": "^1.14",
         "nunomaduro/collision": "^8.8",
         "larastan/larastan": "^3.0",
-        "orchestra/testbench": "^10.0.0||^9.0.0",
         "pestphp/pest": "^4.0",
         "pestphp/pest-plugin-arch": "^4.0",
         "pestphp/pest-plugin-laravel": "^4.0",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan-deprecation-rules": "^2.0",
-        "phpstan/phpstan-phpunit": "^2.0"
+        "phpstan/phpstan-phpunit": "^2.0",
+        "orchestra/testbench": "^v9.15.0|^10.5"
     },
     "autoload": {
         "psr-4": {
@@ -64,7 +66,8 @@
                 "NodusIT\\LaravelMailSync\\LaravelMailSyncServiceProvider"
             ],
             "aliases": {
-                "LaravelMailSync": "NodusIT\\LaravelMailSync\\Facades\\LaravelMailSync"
+                "LaravelMailSync": "NodusIT\\LaravelMailSync\\Facades\\LaravelMailSync",
+                "MailAccount": "NodusIT\\LaravelMailSync\\Facades\\MailAccount"
             }
         }
     },

@@ -5,15 +5,7 @@
 [![GitHub Code Style Action Status](https://img.shields.io/github/actions/workflow/status/nodus-it/laravel-mail-sync/fix-php-code-style-issues.yml?branch=main&label=code%20style&style=flat-square)](https://github.com/nodus-it/laravel-mail-sync/actions?query=workflow%3A"Fix+PHP+code+style+issues"+branch%3Amain)
 [![Total Downloads](https://img.shields.io/packagist/dt/nodus-it/laravel-mail-sync.svg?style=flat-square)](https://packagist.org/packages/nodus-it/laravel-mail-sync)
 
-This is where your description should go. Limit it to a paragraph or two. Consider adding a small example.
-
-## Support us
-
-[<img src="https://github-ads.s3.eu-central-1.amazonaws.com/laravel-mail-sync.jpg?t=1" width="419px" />](https://spatie.be/github-ad-click/laravel-mail-sync)
-
-We invest a lot of resources into creating [best in class open source packages](https://spatie.be/open-source). You can support us by [buying one of our paid products](https://spatie.be/open-source/support-us).
-
-We highly appreciate you sending us a postcard from your hometown, mentioning which of our package(s) you are using. You'll find our address on [our contact page](https://spatie.be/about-us). We publish all received postcards on [our virtual postcard wall](https://spatie.be/open-source/postcards).
+Simple Laravel package to sync emails from an IMAP server to your application.
 
 ## Installation
 
@@ -23,10 +15,9 @@ You can install the package via composer:
 composer require nodus-it/laravel-mail-sync
 ```
 
-You can publish and run the migrations with:
+You can run the migrations with:
 
 ```bash
-php artisan vendor:publish --tag="laravel-mail-sync-migrations"
 php artisan migrate
 ```
 
@@ -36,24 +27,69 @@ You can publish the config file with:
 php artisan vendor:publish --tag="laravel-mail-sync-config"
 ```
 
-This is the contents of the published config file:
-
-```php
-return [
-];
-```
-
 Optionally, you can publish the views using
-
-```bash
-php artisan vendor:publish --tag="laravel-mail-sync-views"
-```
 
 ## Usage
 
+### MailAccountService
+
+The `MailAccountService` allows you to create, update, and manage IMAP mail accounts with automatic validation and connection testing.
+
+#### Creating a Mail Account
+
 ```php
-$laravelMailSync = new NodusIT\LaravelMailSync();
-echo $laravelMailSync->echoPhrase('Hello, NodusIT!');
+$mailAccount = NodusIT\LaravelMailSync\Facades\MailAccount::create([
+    'name' => 'My Account',
+    'email_address' => 'user@mydomain.com',
+    'host' => 'mail.mydomain.com',
+    'port' => 993,
+    'encryption' => 'ssl', // Options: ssl, tls, starttls, none
+    'username' => 'user@mydomain.com',
+    'password' => 'your-app-password',
+    'is_active' => true,
+]);
+```
+
+#### Updating a Mail Account
+
+```php
+$mailAccount = NodusIT\LaravelMailSync\Models\MailAccount::find(1);
+
+$updatedAccount = NodusIT\LaravelMailSync\Facades\MailAccount::update($mailAccount, [
+    'name' => 'Updated Account Name',
+    'port' => 143,
+    'encryption' => 'starttls',
+]);
+```
+
+#### Testing Connection
+
+```php
+$mailAccount = NodusIT\LaravelMailSync\Models\MailAccount::find(1);
+
+$connectionSuccessful = NodusIT\LaravelMailSync\Facades\MailAccount::testExistingConnection($mailAccount);
+
+if ($connectionSuccessful) {
+    echo "Connection successful!";
+} else {
+    echo "Connection failed: " . $mailAccount->last_connection_error;
+}
+```
+
+#### Error Handling
+
+The service automatically validates input data and tests IMAP connections:
+
+```php
+try {
+    $mailAccount = NodusIT\LaravelMailSync\Facades\MailAccount::create($accountData);
+} catch (\Illuminate\Validation\ValidationException $e) {
+    // Handle validation errors
+    $errors = $e->validator->errors();
+} catch (\Exception $e) {
+    // Handle connection or other errors
+    echo "Error: " . $e->getMessage();
+}
 ```
 
 ## Testing
